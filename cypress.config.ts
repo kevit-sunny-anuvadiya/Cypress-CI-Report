@@ -17,7 +17,7 @@ function getConfigurationByFile(file) {
 export default defineConfig({
     reporter: 'cypress-mochawesome-reporter',
     reporterOptions: {
-        videoOnFailOnly: true
+        videoOnFailOnly: false
     },
     e2e: {
         setupNodeEvents(on, config) {
