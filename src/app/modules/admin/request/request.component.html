@@ -1,0 +1,130 @@
+<div
+    class="flex flex-col flex-auto min-w-0"
+    *ngIf="user.isAssociationActive; else notActiveUser"
+>
+    <!-- Main -->
+    <div class="flex-auto p-6 sm:p-10">
+        <div
+            class="text-xl font-semibold tracking-tight leading-7 md:leading-snug truncate flex justify-between mb-3"
+        >
+            {{ 'REQUESTS' | translate }}
+        </div>
+        <div
+            class="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-8 account-tab"
+        >
+            <div
+                class="flex flex-col flex-auto p-3 bg-card shadow rounded-xl relative {{
+                    firmCard.class
+                }}"
+                *ngFor="let firmCard of firmCardInfo"
+                [ngClass]="tabView === firmCard.class ? 'active' : ''"
+                (click)="activeTabs(firmCard.class)"
+            >
+                <h4 class="text-lg font-semibold" [skeleton]="isLoading">
+                    {{ firmCard.name | translate }}
+                </h4>
+                <div class="flex items-center justify-between pt-2">
+                    <div class="flex w-5" [skeleton]="isLoading">
+                        <p class="text-lg font-semibold card-count">
+                            {{ firmCard.requestCount }}
+                        </p>
+                    </div>
+                    <div class="flex" [skeleton]="isLoading">
+                        <a class="view-link">{{ 'VIEW' | translate }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div
+            class="task-info mt-8"
+            [ngClass]="tabView"
+            infiniteScroll
+            [infiniteScrollDistance]="2"
+            [infiniteScrollThrottle]="50"
+            [scrollWindow]="false"
+            (scrolled)="onScrollGetTask()"
+        >
+            <ng-container
+                [ngTemplateOutlet]="dataTemplate"
+                [ngTemplateOutletContext]="{
+                    task: tabView === 'SENT' ? sentData : completeData
+                }"
+            >
+            </ng-container>
+        </div>
+    </div>
+</div>
+
+<ng-template #dataTemplate let-task="task">
+    <ng-container *ngFor="let taskList of task; let i = index">
+        <div
+            class="p-5 bg-card shadow rounded-xl flex md:flex-nowrap flex-wrap items-center mb-3"
+        >
+            <div class="deadline-info md:border-r-2 pr-8">
+                <h4 class="text-lg font-semibold" [skeleton]="isLoading">
+                    {{ 'DEADLINE' | translate }}
+                </h4>
+                <div class="flex py-4" [skeleton]="isLoading">
+                    {{ taskList?.kamigoSettings?.deadline | date }}
+                </div>
+                <div [skeleton]="isLoading">
+                    <div class="tab-request text-white flex">
+                        {{ 'ACCOUNTING' | translate }}
+                    </div>
+                </div>
+            </div>
+            <div class="personal-info md:pl-10">
+                <h4 class="text-2xl font-semibold text-gray-700 pb-1">
+                    {{ taskInformation?.firms?.firmName }}
+                </h4>
+                <h4 class="text-lg font-semibold" [skeleton]="isLoading">
+                    {{ taskList?.kamigoSettings?.title }}
+                </h4>
+                <div class="text-sm py-2 flex" [skeleton]="isLoading">
+                    {{ taskList?.kamigoSettings?.description }}
+                </div>
+                <ng-container
+                    *ngIf="tabView !== 'COMPLETED'; else completeButton"
+                >
+                    <div [skeleton]="isLoading">
+                        <a
+                            [ngClass]="{ 'pointer-events-none': isGetLink }"
+                            class="fill-questionnaire-button cursor-pointer flex"
+                            (click)="taskLink(taskList._id, i)"
+                            >{{ taskList?.kamigoSettings?.buttonText }}
+                            <mat-spinner
+                                color="primary"
+                                diameter="20"
+                                *ngIf="isGetLink && progressIndex === i"
+                            ></mat-spinner>
+                        </a>
+                    </div>
+                </ng-container>
+                <ng-template #completeButton>
+                    <a
+                        class="fill-questionnaire-button"
+                        [translate]="'COMPLETED_ON'"
+                        [translateParams]="{
+                            date: taskList?.completedAt | date
+                        }"
+                    ></a>
+                </ng-template>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>
+<ng-template #notActiveUser>
+    <div class="flex flex-col items-center justify-center w-full h-full">
+        <div class="w-full max-w-3xl">
+            <div class="max-w-none mx-auto prose prose-sm">
+                <img
+                    class="w-20"
+                    src="assets/images/logo/logo.svg"
+                    alt="Logo image"
+                />
+                <h1>{{ 'ASSOCIATED_ACCOUNTS_NOT_FOUND' | translate }}</h1>
+                <p>{{ 'FIRM_AFFILIATION' | translate }}</p>
+            </div>
+        </div>
+    </div>
+</ng-template>

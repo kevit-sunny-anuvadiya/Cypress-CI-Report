@@ -1,0 +1,94 @@
+<div class="bg-card">
+    <div class="flex flex-col w-full mx-auto px-6 sm:px-8">
+        <div
+            class="flex flex-col sm:flex-row flex-auto sm:items-center min-w-0 my-3"
+        >
+            <div class="flex flex-auto items-center min-w-0">
+                <div
+                    [skeleton]="isLoading"
+                    class="flex w-16 h-16 rounded-full overflow-hidden items-center justify-center bg-slate-100 border"
+                >
+                    <img
+                        class="w-16 h-16 rounded-full overflow-hidden"
+                        *ngIf="user.profilePic"
+                        [src]="user.profilePic"
+                    />
+                    <mat-icon
+                        *ngIf="!user.profilePic"
+                        class="firm-icon flex material-symbols-outlined"
+                    >
+                        account_circle
+                    </mat-icon>
+                </div>
+                <div class="flex flex-col min-w-0 ml-4">
+                    <div
+                        [skeleton]="isLoading"
+                        class="text-xl font-semibold tracking-tight leading-7 md:leading-snug truncate"
+                    >
+                        {{ user.firstName + ' ' + user.lastName }}
+                    </div>
+                    <div [skeleton]="isLoading" class="flex items-center">
+                        <mat-icon class="text-lg justify-start"
+                            >notifications_active</mat-icon
+                        >
+                        <div
+                            class="ml-1.5 leading-6 truncate text-secondary font-semibold"
+                            [translate]="'YOU_HAVE_OUTSTANDING_NOTIFICATIONS'"
+                            [translateParams]="{ number: '0' }"
+                        ></div>
+                    </div>
+                    <div [skeleton]="isLoading" class="flex items-center">
+                        <mat-icon class="text-lg justify-start">rule</mat-icon>
+                        <div
+                            class="ml-1.5 leading-6 truncate text-secondary font-semibold"
+                            [translate]="'YOU_HAVE_OUTSTANDING_TASKS'"
+                            [translateParams]="{
+                                number: taskInfo?.totalOutStandingTask
+                                    ? taskInfo?.totalOutStandingTask
+                                    : 0
+                            }"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div
+        class="px-6 sm:px-8 w-screen md:w-full overflow-x-auto"
+        *ngIf="!router.url.includes('profile')"
+    >
+        <mat-button-toggle-group
+            name="favoriteColor"
+            aria-label="Favorite Color"
+        >
+            <mat-button-toggle
+                *ngIf="user.isAssociationActive"
+                (click)="setTaskDetails()"
+                [checked]="true"
+                [value]="user.firstName"
+                class="px-6 mr-3"
+            >
+                <div class="overflow-ellipsis truncate max-w-40 h-6">
+                    {{ user.firstName + ' ' + user.lastName }}
+                </div>
+                <p
+                    *ngIf="taskInfo?.totalOutStandingTask"
+                    class="count bg-red-600 rounded-full w-5 h-5 text-white"
+                >
+                    {{ taskInfo?.totalOutStandingTask }}
+                </p>
+            </mat-button-toggle>
+
+            <mat-button-toggle
+                [disabled]="true"
+                [value]="'Your Company (coming soon)'"
+                class="px-6 mr-3"
+                [matTooltip]="'Your Company (coming soon)'"
+            >
+                <div class="overflow-ellipsis truncate max-w-40 h-6">
+                    Your Company (coming soon)
+                </div>
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+</div>

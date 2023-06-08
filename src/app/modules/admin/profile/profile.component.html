@@ -1,0 +1,641 @@
+<mat-drawer-container class="example-container w-full" autosize>
+    <mat-drawer
+        #drawer
+        class="example-sidenav"
+        [mode]="sidebarMode"
+        [opened]="isOpened"
+    >
+        <div class="mat-drawer-inner-container bg-white max-w-sm">
+            <div class="flex items-center justify-between m-8 mr-6 sm:my-10">
+                <div
+                    class="text-4xl font-extrabold tracking-tight leading-none"
+                >
+                    {{ 'SETTINGS' | translate }}
+                </div>
+                <button
+                    mat-icon-button
+                    (click)="drawer.toggle()"
+                    class="ml-6 md:hidden"
+                >
+                    <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+                </button>
+            </div>
+            <div class="flex flex-col divide-y border-t border-b">
+                <div
+                    (click)="selectProfile(index)"
+                    [id]="profile.name"
+                    class="flex px-8 py-5 cursor-pointer hover:bg-gray-100"
+                    *ngFor="let profile of profileTabs; index as index"
+                    [ngClass]="{ 'bg-gray-100': profile.isActive }"
+                >
+                    <mat-icon
+                        class="material-symbols-outlined mat-icon notranslate mat-icon-no-color"
+                        >{{ profile.iconName }}</mat-icon
+                    >
+                    <div class="ml-3">
+                        <div class="font-medium leading-6">
+                            {{ profile.name | translate }}
+                        </div>
+                        <div class="mt-0.5 text-secondary">
+                            {{ profile.dis | translate }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-drawer>
+    <button mat-icon-button (click)="drawer.toggle()" class="ml-6 md:hidden">
+        <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+    </button>
+    <div class="flex flex-col flex-auto min-w-0 max-w-4xl">
+        <!-- Main -->
+        <div class="flex-auto p-6 sm:p-10">
+            <div class="grid grid-cols-1 gap-8 account-tab">
+                <div *ngIf="activeTabs === 'PROFILE_INFORMATION'">
+                    <form class="mt-8" [formGroup]="profileForm">
+                        <!-- Name field -->
+
+                        <div
+                            [skeleton]="isLoading || isProfileEdit"
+                            class="flex w-20 h-20 mb-4 bg-white rounded-full items-center justify-center border relative"
+                        >
+                            <img
+                                class="rounded-full w-20 h-20 object-cover"
+                                *ngIf="
+                                    profileForm?.value?.profilePic;
+                                    else profileIcon
+                                "
+                                [src]="profileForm?.value?.profilePic"
+                                alt=""
+                            />
+                            <ng-template #profileIcon>
+                                <mat-icon
+                                    class="profile-icon flex material-symbols-outlined"
+                                >
+                                    account_circle
+                                </mat-icon>
+                            </ng-template>
+                            <input
+                                class="hidden"
+                                id="profile"
+                                accept="image/png, image/jpeg, image/svg"
+                                type="file"
+                                (change)="uploadFile($event)"
+                            />
+                            <label
+                                for="profile"
+                                class="cursor-pointer absolute bottom-0 -right-2 bg-slate-200 w-7 h-7 flex items-center justify-center bg-white rounded-full"
+                            >
+                                <mat-icon
+                                    class="material-symbols-outlined text-lg"
+                                    >edit</mat-icon
+                                >
+                            </label>
+                        </div>
+
+                        <mat-form-field
+                            class="w-full"
+                            *ngIf="!isLoading; else ghostLoader"
+                        >
+                            <mat-label [skeleton]="isLoading">{{
+                                'FIRST_NAME' | translate
+                            }}</mat-label>
+                            <mat-icon
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:user'"
+                                class="mr-3"
+                            ></mat-icon>
+                            <input
+                                id="firstName"
+                                matInput
+                                [formControlName]="'firstName'"
+                                data-cy="profileFirstName"
+                            />
+                            <mat-error
+                                *ngIf="
+                                    profileForm
+                                        .get('firstName')
+                                        .hasError('required')
+                                "
+                            >
+                                {{ 'FIRST_NAME_IS_REQUIRED' | translate }}
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field
+                            class="w-full"
+                            *ngIf="!isLoading; else ghostLoader"
+                        >
+                            <mat-label [skeleton]="isLoading">{{
+                                'LAST_NAME' | translate
+                            }}</mat-label>
+                            <mat-icon
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:user'"
+                            ></mat-icon>
+                            <input
+                                id="lastName"
+                                matInput
+                                [formControlName]="'lastName'"
+                                data-cy="profileLastName"
+                            />
+                            <mat-error
+                                *ngIf="
+                                    profileForm
+                                        .get('lastName')
+                                        .hasError('required')
+                                "
+                            >
+                                {{ 'LAST_NAME_IS_REQUIRED' | translate }}
+                            </mat-error>
+                        </mat-form-field>
+
+                        <!-- Email field -->
+                        <mat-form-field
+                            class="w-full"
+                            *ngIf="!isLoading; else ghostLoader"
+                        >
+                            <mat-label [skeleton]="isLoading">{{
+                                'EMAIL' | translate
+                            }}</mat-label>
+                            <mat-icon
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:mail'"
+                            ></mat-icon>
+                            <input
+                                data-cy="profileEmail"
+                                id="email"
+                                matInput
+                                [formControlName]="'email'"
+                                (focusout)="checkEmail()"
+                            />
+                            <mat-error
+                                *ngIf="
+                                    profileForm
+                                        .get('email')
+                                        .hasError('required')
+                                "
+                            >
+                                {{ 'EMAIL_IS_REQUIRED' | translate }}
+                            </mat-error>
+                            <mat-error
+                                *ngIf="
+                                    profileForm.get('email').hasError('email')
+                                "
+                            >
+                                {{
+                                    'PLEASE_ENTER_A_VALID_EMAIL_ADDRESS'
+                                        | translate
+                                }}
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field
+                            class="w-full"
+                            *ngIf="!isLoading; else ghostLoader"
+                        >
+                            <mat-label [skeleton]="isLoading"
+                                >Select an option</mat-label
+                            >
+                            <mat-icon
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:globe-alt'"
+                            ></mat-icon>
+                            <mat-select
+                                [formControlName]="'language'"
+                                data-cy="profileLanguage"
+                            >
+                                <mat-option
+                                    value="en"
+                                    data-cy="profileLanguage1"
+                                    >{{ 'ENGLISH' | translate }}</mat-option
+                                >
+                                <mat-option
+                                    value="de"
+                                    data-cy="profileLanguage2"
+                                    >{{ 'GERMAN' | translate }}</mat-option
+                                >
+                                <mat-option
+                                    value="fr"
+                                    data-cy="profileLanguage3"
+                                    >{{ 'FRENCH' | translate }}</mat-option
+                                >
+                                <mat-option
+                                    value="nl"
+                                    data-cy="profileLanguage4"
+                                    >{{ 'DUTCH' | translate }}</mat-option
+                                >
+                            </mat-select>
+                        </mat-form-field>
+                    </form>
+                    <button
+                        [disabled]="profileForm.invalid || isUpdating"
+                        class="fuse-mat-button-small flex justify-end ml-auto mt-6"
+                        mat-flat-button
+                        [color]="'primary'"
+                        (click)="sendOTP()"
+                        data-cy="profileSave"
+                    >
+                        <span>{{ 'SAVE' | translate }} </span>
+                    </button>
+                </div>
+                <div *ngIf="activeTabs === 'SECURITY'">
+                    <div
+                        class="text-xl mb-8 font-semibold tracking-tight leading-7 md:leading-snug truncate"
+                    >
+                        {{ 'CHANGE_YOUR_PASSWORD' | translate }}
+                    </div>
+                    <form class="mt-8" [formGroup]="passwordForm">
+                        <mat-form-field
+                            class="w-full"
+                            *ngIf="!isLoading; else ghostLoader"
+                        >
+                            <mat-label [skeleton]="isLoading">{{
+                                'PASSWORD' | translate
+                            }}</mat-label>
+                            <mat-icon
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:key'"
+                            ></mat-icon>
+                            <input
+                                id="password"
+                                type="password"
+                                matInput
+                                [formControlName]="'password'"
+                                data-cy="profileCurrentPassword"
+                                #password
+                            />
+                            <button
+                                mat-icon-button
+                                type="button"
+                                (click)="
+                                    password.type === 'password'
+                                        ? (password.type = 'text')
+                                        : (password.type = 'password')
+                                "
+                                matSuffix
+                            >
+                                <mat-icon
+                                    class="icon-size-5"
+                                    *ngIf="password.type === 'password'"
+                                    [svgIcon]="'heroicons_solid:eye'"
+                                ></mat-icon>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    *ngIf="password.type === 'text'"
+                                    [svgIcon]="'heroicons_solid:eye-off'"
+                                ></mat-icon>
+                            </button>
+                            <mat-error
+                                >{{
+                                    'PASSWORD_MUST_CONTAIN_AT_LEAST_EIGHT_CHARACTERS_AT_LEAST_ONE_NUMBER_AND_BOTH_LOWER_AND_UPPERCASE_LETTERS_AND_SPECIAL_CHARACTERS'
+                                        | translate
+                                }}
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field
+                            class="w-full"
+                            *ngIf="!isLoading; else ghostLoader"
+                        >
+                            <mat-label [skeleton]="isLoading">{{
+                                'NEW_PASSWORD' | translate
+                            }}</mat-label>
+                            <mat-icon
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:key'"
+                            ></mat-icon>
+                            <input
+                                type="password"
+                                id="newPassword"
+                                matInput
+                                [formControlName]="'newPassword'"
+                                data-cy="profileNewPassword"
+                                #newPassword
+                            />
+                            <button
+                                mat-icon-button
+                                type="button"
+                                (click)="
+                                    newPassword.type === 'password'
+                                        ? (newPassword.type = 'text')
+                                        : (newPassword.type = 'password')
+                                "
+                                matSuffix
+                            >
+                                <mat-icon
+                                    class="icon-size-5"
+                                    *ngIf="newPassword.type === 'password'"
+                                    [svgIcon]="'heroicons_solid:eye'"
+                                ></mat-icon>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    *ngIf="newPassword.type === 'text'"
+                                    [svgIcon]="'heroicons_solid:eye-off'"
+                                ></mat-icon>
+                            </button>
+                            <mat-error
+                                >{{
+                                    'PASSWORD_MUST_CONTAIN_AT_LEAST_EIGHT_CHARACTERS_AT_LEAST_ONE_NUMBER_AND_BOTH_LOWER_AND_UPPERCASE_LETTERS_AND_SPECIAL_CHARACTERS'
+                                        | translate
+                                }}
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field
+                            class="w-full relative"
+                            *ngIf="!isLoading; else ghostLoader"
+                        >
+                            <mat-label [skeleton]="isLoading">{{
+                                'RE_ENTER_NEW_PASSWORD' | translate
+                            }}</mat-label>
+                            <mat-icon
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:key'"
+                            ></mat-icon>
+                            <input
+                                data-cy="profileNewPasswordReEnter"
+                                type="password"
+                                id="reEnterPassword"
+                                matInput
+                                [formControlName]="'reEnterPassword'"
+                                #reEnterPassword
+                            />
+                            <button
+                                mat-icon-button
+                                type="button"
+                                (click)="
+                                    reEnterPassword.type === 'password'
+                                        ? (reEnterPassword.type = 'text')
+                                        : (reEnterPassword.type = 'password')
+                                "
+                                matSuffix
+                            >
+                                <mat-icon
+                                    class="icon-size-5"
+                                    *ngIf="reEnterPassword.type === 'password'"
+                                    [svgIcon]="'heroicons_solid:eye'"
+                                ></mat-icon>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    *ngIf="reEnterPassword.type === 'text'"
+                                    [svgIcon]="'heroicons_solid:eye-off'"
+                                ></mat-icon>
+                            </button>
+                            <mat-error
+                                *ngIf="
+                                    passwordForm
+                                        .get('reEnterPassword')
+                                        .hasError('required')
+                                "
+                            >
+                                {{ 'CONFIRM_PASSWORD_REQUIRED' | translate }}
+                            </mat-error>
+                            <mat-error
+                                *ngIf="
+                                    passwordForm
+                                        .get('reEnterPassword')
+                                        .hasError('mustMatch')
+                                "
+                            >
+                                {{ 'PASSWORD_NOT_MATCH' | translate }}
+                            </mat-error>
+                        </mat-form-field>
+                    </form>
+                    <button
+                        data-cy="profilePasswordSaveButton"
+                        class="fuse-mat-button-small flex justify-end ml-auto mt-6"
+                        mat-flat-button
+                        [disabled]="passwordForm.invalid"
+                        [color]="'primary'"
+                        (click)="changePassword()"
+                    >
+                        <span>{{ 'SAVE' | translate }} </span>
+                    </button>
+                    <div>
+                        <div
+                            class="text-xl mb-8 font-semibold tracking-tight leading-7 md:leading-snug truncate"
+                        >
+                            {{ 'TFA_SETTINGS' | translate }}
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2
+                                    class="font-medium leading-6"
+                                    [skeleton]="isLoading"
+                                    *ngIf="!isEnable"
+                                >
+                                    {{ 'ENABLE_TFA' | translate }}
+                                </h2>
+                                <p class="text-sm">
+                                    {{ 'ENABLE_TFA_DIS' | translate }}
+                                </p>
+                            </div>
+                            <mat-slide-toggle
+                                [(ngModel)]="checkEnable"
+                                (change)="changeTFASetting(TFA_profile)"
+                            ></mat-slide-toggle>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-8 account-tab mt-8">
+                <div *ngIf="activeTabs === 'DELETE_PROFILE'">
+                    <div
+                        class="text-xl mb-8 font-semibold tracking-tight leading-7 md:leading-snug truncate"
+                    >
+                        {{ 'DELETE_PROFILE' | translate }}
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2
+                                class="font-medium leading-6"
+                                [skeleton]="isLoading"
+                                *ngIf="!isEnable"
+                            >
+                                {{ 'DELETE_YOUR_PROFILE' | translate }}
+                            </h2>
+                            <p class="text-sm">
+                                {{ 'DELETE_INFO' | translate }}
+                            </p>
+                        </div>
+                        <div class="delete-profile">
+                            <button
+                                class="fuse-mat-button-small flex justify-end ml-auto delete-profile-button"
+                                mat-flat-button
+                                [color]="'primary'"
+                                (click)="deleteProfileModal(deleteProfileTemp)"
+                            >
+                                <span>{{ 'DELETE_PROFILE' | translate }} </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template #ghostLoader>
+        <div class="w-full">
+            <div class="w-24 h-4" [skeleton]="isLoading"></div>
+            <div class="w-full h-12" [skeleton]="isLoading"></div>
+        </div>
+    </ng-template>
+
+    <div
+        class="w-screen h-screen fixed top-0 left-0 bg-white z-50"
+        *ngIf="openVerificationModal"
+    >
+        <img
+            src="assets/images/logo/logo-text.svg"
+            alt=""
+            class="flex mx-auto p-6 w-44 items-center justify-center"
+        />
+        <div
+            class="flex max-w-md flex-col items-center mx-auto shadow-lg rounded-md p-6"
+        >
+            <div mat-dialog-content class="p-0">
+                <img
+                    src="assets/images/verify.svg"
+                    alt=""
+                    class="w-60 mx-auto"
+                />
+                <p>{{ 'ENTER_VERIFICATION_CODE' | translate }}</p>
+                <small
+                    >{{
+                        'VERIFICATION_CODE_SEND_TO_YOUR_EMAIL_ADDRESS'
+                            | translate
+                    }}
+                    <strong>{{ profileForm.value.email }}</strong>
+                </small>
+                <mat-form-field appearance="fill" class="w-full">
+                    <input
+                        maxlength="6"
+                        minlength="6"
+                        [(ngModel)]="sendVerification"
+                        matInput
+                        type="number"
+                        class="w-full"
+                    />
+                </mat-form-field>
+            </div>
+            <div mat-dialog-actions>
+                <button
+                    class="fuse-mat-button-large w-full"
+                    mat-flat-button
+                    [disabled]="!sendVerification"
+                    [color]="'primary'"
+                    (click)="updateUserDetails()"
+                >
+                    <span> {{ 'VERIFY_YOUR_ACCOUNT' | translate }} </span>
+                </button>
+            </div>
+            <div class="my-4 border w-full"></div>
+            <div class="flex">
+                <p class="pr-2">{{ 'RESEND_OTP_IN' | translate }} :</p>
+                <countdown
+                    #cd
+                    (event)="checkCountdown($event)"
+                    [config]="{ leftTime: 300, format: 'm:s' }"
+                ></countdown>
+            </div>
+            <div class="flex">
+                <p
+                    (click)="openVerificationModal = false"
+                    class="cursor-pointer text-sky-600"
+                >
+                    {{ 'BACK_TO_PROFILE' | translate }}
+                </p>
+                <ng-container *ngIf="reSendOTP">
+                    <p class="px-2">|</p>
+                    <p
+                        (click)="sendOTP(); cd.restart()"
+                        class="cursor-pointer text-sky-600"
+                    >
+                        Resend OTP
+                    </p>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</mat-drawer-container>
+<ng-template #deleteProfileTemp>
+    <div class="header">
+        <h4
+            class="text-xl font-semibold tracking-tight leading-7 md:leading-snug truncate"
+        >
+            {{ 'DELETE_PROFILE_MESSAGE' | translate }}
+        </h4>
+        <mat-divider class="my-4"></mat-divider>
+        <form class="mt-8" [formGroup]="deleteProfileForm">
+            <mat-form-field class="w-full" *ngIf="!isLoading; else ghostLoader">
+                <mat-label [skeleton]="isLoading">{{
+                    'PASSWORD' | translate
+                }}</mat-label>
+                <mat-icon
+                    matPrefix
+                    [svgIcon]="'heroicons_solid:key'"
+                ></mat-icon>
+                <input
+                    id="deleteProfilePassword"
+                    type="password"
+                    matInput
+                    [formControlName]="'password'"
+                    data-cy="deleteProfilePassword"
+                    #password
+                />
+            </mat-form-field>
+        </form>
+        <div mat-dialog-actions>
+            <button
+                class="fuse-mat-button-large w-full"
+                mat-flat-button
+                [disabled]="!deleteProfileForm.get('password').value"
+                [color]="'primary'"
+                (click)="deleteProfile()"
+            >
+                <span> {{ 'DELETE_PROFILE' | translate }} </span>
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #TFA_profile>
+    <h4
+        class="text-xl font-semibold tracking-tight leading-7 md:leading-snug truncate"
+    >
+        <ng-container *ngIf="TFAImage && !isEnable else otpText">
+            {{ 'SCAN_QR' | translate }}
+        </ng-container>
+        <ng-template #otpText>
+            {{ 'ENTER_OTP' | translate }}
+        </ng-template>
+    </h4>
+    <mat-divider class="my-4"></mat-divider>
+    <div [skeleton]="isLoading">
+        <img
+            alt=""
+            *ngIf="TFAImage && !isEnable"
+            [src]="TFAImage"
+            class="w-1/2 h-1/2 mb-4 mt-4 mx-auto"
+        />
+    </div>
+    <mat-form-field class="w-full" *ngIf="!isLoading; else ghostLoader">
+        <mat-label [skeleton]="isLoading">{{
+            'ENTER_CODE' | translate
+        }}</mat-label>
+        <mat-icon
+            matPrefix
+            [svgIcon]="'heroicons_solid:lock-closed'"
+        ></mat-icon>
+        <input matInput type="number" [(ngModel)]="enableAuthentication" />
+    </mat-form-field>
+    <button
+        class="fuse-mat-button-small flex justify-center mx-auto mt-4"
+        mat-flat-button
+        [color]="'primary'"
+        (click)="enableTFA()"
+        [disabled]="isUpdating || !enableAuthentication?.toString().length"
+    >
+        <span>{{ (isEnable ? 'DISABLE' : 'ENABLE') | translate }} </span>
+    </button>
+</ng-template>

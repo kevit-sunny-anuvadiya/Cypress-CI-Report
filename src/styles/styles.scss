@@ -1,0 +1,121 @@
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ Import/write your custom styles here.
+/*  @ Styles from this file will override 'vendors.scss' and Fuse's base styles.
+/* ----------------------------------------------------------------------------------------------------- */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+.mat-button-toggle-group {
+    border-radius: 0 !important;
+    .mat-button-toggle-appearance-standard {
+        background-color: #c6c6c6 !important;
+        .mat-button-toggle-label-content {
+            color: #ffffff;
+        }
+    }
+    .mat-button-toggle {
+        border-radius: 10px 10px 0 0 !important;
+        .mat-button-toggle-label-content {
+            line-height: 30px !important;
+            font-weight: bold;
+        }
+        &.mat-button-toggle-checked {
+            background-color: #f1f5fa !important;
+        }
+    }
+}
+
+.tabs {
+    .mat-mdc-tab-group .mat-mdc-tab-body-content {
+        padding: 20px 0px 0px 0px !important;
+    }
+    .mat-mdc-tab-group .mat-mdc-tab-header .mat-mdc-tab-label-container {
+        margin: 0 !important;
+        flex-grow: 0 !important;
+    }
+    .mdc-tab {
+        padding-right: 0;
+        padding-left: 15px;
+    }
+    .mat-mdc-tab-header {
+        max-width: 400rem;
+    }
+}
+
+.header-profile-image {
+    .mat-mdc-icon-button {
+        img {
+            height: 1.75rem !important;
+        }
+    }
+}
+.gray-disable {
+    .mat-mdc-form-field-flex {
+        background-color: #f5f5f5;
+    }
+}
+.skeleton-loader-parent {
+    overflow: hidden;
+    position: relative;
+    display: inline-block;
+    margin-bottom: 5px;
+    .skeleton-loader {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: #eaeaea;
+        border-radius: 6px;
+        background-image: linear-gradient(
+            to right,
+            #eaeaea 0%,
+            rgba(0, 0, 0, 0.07) 20%,
+            #eaeaea 40%,
+            #eaeaea 100%
+        );
+        background-repeat: no-repeat;
+        background-size: 450px 400px;
+        animation: shimmer 1s linear infinite;
+    }
+}
+@keyframes shimmer {
+    0% {
+        background-position: -450px 0;
+    }
+    100% {
+        background-position: 450px 0;
+    }
+}
+.disable {
+    filter: grayscale(1);
+    pointer-events: none;
+}
+invalid-token {
+    width: 100%;
+}
+revoke-access {
+    width: 100%;
+}
+.hide_Captcha {
+    .grecaptcha-badge {
+        display: none !important;
+    }
+}
+.firm-logo {
+    max-width: 250px;
+}
+auth-sign-up,
+app-profile,
+auth-reset-password {
+    .mat-mdc-form-field.mat-form-field-appearance-fill.mat-form-field-invalid {
+        padding-bottom: 40px;
+    }
+}

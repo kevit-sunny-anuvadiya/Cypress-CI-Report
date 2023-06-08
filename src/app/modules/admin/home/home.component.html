@@ -1,0 +1,61 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <!-- Main -->
+
+    <div class="flex-auto p-6 sm:p-10">
+        <app-accounting-firm></app-accounting-firm>
+        <ng-container *ngIf="user.isAssociationActive">
+            <div
+                class="text-xl mb-8 mt-8 font-semibold tracking-tight leading-7 md:leading-snug truncate"
+            >
+                {{ 'LEGAL' | translate }}
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-8">
+                <div
+                    class="flex flex-col flex-auto p-4 bg-card shadow opacity-50 cursor-not-allowed rounded-xl relative"
+                >
+                    <h4
+                        class="text-lg min-h-[40px] font-semibold"
+                        [skeleton]="isHomeLoader"
+                    >
+                        {{ 'COMING_SOON' | translate }}
+                    </h4>
+                    <div
+                        class="flex justify-center items-center"
+                        [skeleton]="isHomeLoader"
+                    >
+                        <mat-icon
+                            class="text-sky-500 mb-8 material-symbols-outlined text-6xl h-10 w-10 self-center my-2 justify-start"
+                            >gavel
+                        </mat-icon>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="text-xl mb-8 mt-8 font-semibold tracking-tight leading-7 md:leading-snug truncate"
+            >
+                {{ 'MOBILITY' | translate }}
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-8">
+                <div
+                    class="flex flex-col flex-auto p-4 bg-card shadow opacity-50 cursor-not-allowed rounded-xl relative"
+                >
+                    <h4
+                        class="text-lg min-h-[40px] font-semibold"
+                        [skeleton]="isHomeLoader"
+                    >
+                        {{ 'COMING_SOON' | translate }}
+                    </h4>
+                    <div
+                        class="flex justify-center items-center"
+                        [skeleton]="isHomeLoader"
+                    >
+                        <mat-icon
+                            class="text-sky-500 mb-8 material-symbols-outlined text-6xl h-10 w-10 self-center my-2 justify-start"
+                            >garage
+                        </mat-icon>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>

@@ -1,0 +1,356 @@
+<div
+    class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0"
+>
+    <div
+        class="md:flex md:items-center md:justify-center w-full sm:w-auto md:h-full md:w-1/2 py-8 px-4 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card"
+    >
+        <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
+            <!-- Title -->
+            <div
+                class="mt-8 text-4xl font-extrabold tracking-tight leading-tight"
+            >
+                {{ 'SIGN_UP' | translate }}
+            </div>
+            <div class="flex items-baseline mt-0.5 font-medium">
+                <div>
+                    {{ 'CREATE_QUESTIONNAIRE' | translate }}
+                </div>
+            </div>
+
+            <!-- Alert -->
+            <fuse-alert
+                class="mt-8"
+                *ngIf="showAlert"
+                [appearance]="'outline'"
+                [showIcon]="false"
+                [type]="alert.type"
+                [@shake]="alert.type === 'error'"
+            >
+                {{ alert.message }}
+            </fuse-alert>
+
+            <!-- Sign Up form -->
+            <form class="mt-8" [formGroup]="signUpForm" #signUpNgForm="ngForm">
+                <!-- Name field -->
+                <mat-form-field class="w-full gray-disable">
+                    <mat-label>{{ 'FIRST_NAME' | translate }}</mat-label>
+                    <input
+                        readonly
+                        id="name"
+                        matInput
+                        [formControlName]="'firstName'"
+                        data-cy="signUpName"
+                    />
+                    <mat-error
+                        *ngIf="signUpForm.get('firstName').hasError('required')"
+                    >
+                        {{ 'FIRST_NAME_IS_REQUIRED' | translate }}
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Name field -->
+                <mat-form-field class="w-full gray-disable">
+                    <mat-label>{{ 'LAST_NAME' | translate }}</mat-label>
+                    <input
+                        id="lastName"
+                        matInput
+                        [formControlName]="'lastName'"
+                        data-cy="signUpLastName"
+                        readonly
+                    />
+                    <mat-error
+                        *ngIf="signUpForm.get('lastName').hasError('required')"
+                    >
+                        {{ 'LAST_NAME_IS_REQUIRED' | translate }}
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Email field -->
+                <mat-form-field class="w-full">
+                    <mat-label>{{ 'EMAIL_ADDRESS' | translate }}</mat-label>
+                    <input
+                        data-cy="signUpEmail"
+                        id="email"
+                        matInput
+                        [formControlName]="'email'"
+                        (focusout)="checkEmail()"
+                    />
+                    <mat-icon
+                        matSuffix
+                        class="icon-size-5 text-green-700"
+                        *ngIf="isEmailAvailable"
+                        [svgIcon]="'heroicons_solid:badge-check'"
+                    ></mat-icon>
+                    <mat-icon
+                        matSuffix
+                        class="icon-size-5 text-red-700"
+                        *ngIf="!isEmailAvailable"
+                        [svgIcon]="'heroicons_solid:exclamation-circle'"
+                    ></mat-icon>
+                    <mat-error
+                        *ngIf="signUpForm.get('email').hasError('required')"
+                    >
+                        {{ 'EMAIL_ADDRESS_IS_REQUIRED' | translate }}
+                    </mat-error>
+                    <mat-error
+                        *ngIf="signUpForm.get('email').hasError('email')"
+                    >
+                        {{ 'PLEASE_ENTER_A_VALID_EMAIL_ADDRESS' | translate }}
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Password field -->
+                <mat-form-field class="w-full">
+                    <mat-label>{{ 'PASSWORD' | translate }}</mat-label>
+                    <input
+                        data-cy="signUpPassword"
+                        id="password"
+                        matInput
+                        type="password"
+                        [formControlName]="'password'"
+                        #passwordField
+                    />
+                    <button
+                        mat-icon-button
+                        type="button"
+                        (click)="
+                            passwordField.type === 'password'
+                                ? (passwordField.type = 'text')
+                                : (passwordField.type = 'password')
+                        "
+                        matSuffix
+                    >
+                        <mat-icon
+                            class="icon-size-5"
+                            *ngIf="passwordField.type === 'password'"
+                            [svgIcon]="'heroicons_solid:eye'"
+                        ></mat-icon>
+                        <mat-icon
+                            class="icon-size-5"
+                            *ngIf="passwordField.type === 'text'"
+                            [svgIcon]="'heroicons_solid:eye-off'"
+                        ></mat-icon>
+                    </button>
+                    <mat-error>
+                        {{
+                            'PASSWORD_MUST_CONTAIN_AT_LEAST_EIGHT_CHARACTERS_AT_LEAST_ONE_NUMBER_AND_BOTH_LOWER_AND_UPPERCASE_LETTERS_AND_SPECIAL_CHARACTERS'
+                                | translate
+                        }}
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-full">
+                    <mat-label>{{ 'CONFIRM_PASSWORD' | translate }}</mat-label>
+                    <input
+                        data-cy="signUpConfirmPassword"
+                        id="confirmPassword"
+                        matInput
+                        type="password"
+                        [formControlName]="'confirmPassword'"
+                        #confirmPassword
+                    />
+                    <button
+                        mat-icon-button
+                        type="button"
+                        (click)="
+                            confirmPassword.type === 'password'
+                                ? (confirmPassword.type = 'text')
+                                : (confirmPassword.type = 'password')
+                        "
+                        matSuffix
+                    >
+                        <mat-icon
+                            class="icon-size-5"
+                            *ngIf="confirmPassword.type === 'password'"
+                            [svgIcon]="'heroicons_solid:eye'"
+                        ></mat-icon>
+                        <mat-icon
+                            class="icon-size-5"
+                            *ngIf="confirmPassword.type === 'text'"
+                            [svgIcon]="'heroicons_solid:eye-off'"
+                        ></mat-icon>
+                    </button>
+                    <mat-error
+                        *ngIf="
+                            signUpForm
+                                .get('confirmPassword')
+                                .hasError('required')
+                        "
+                    >
+                        {{ 'CONFIRM_PASSWORD_IS_REQUIRED' | translate }}
+                    </mat-error>
+                    <mat-error
+                        *ngIf="
+                            signUpForm
+                                .get('confirmPassword')
+                                .hasError('mustMatch')
+                        "
+                    >
+                        {{ 'PASSWORD_DOES_NOT_MATCH' | translate }}
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- ToS and PP -->
+                <div class="inline-flex items-end w-full mt-1.5">
+                    <mat-checkbox
+                        class="-ml-2"
+                        [color]="'primary'"
+                        [formControlName]="'agreements'"
+                    >
+                        <span data-cy="signUpTerms">{{
+                            'I_AGREE_WITH' | translate
+                        }}</span>
+                        <a
+                            href="https://storage.googleapis.com/kamig-development/TANDC/Kamigo%20Algemene%20Voorwaarden.pdf"
+                            target="_blank"
+                            class="ml-1 text-primary-500 hover:underline"
+                            >{{ 'TERMS' | translate }} {{ 'AND' | translate }}
+                            {{ 'PRIVACY_POLICY' | translate }}
+                        </a>
+                    </mat-checkbox>
+                </div>
+                <!-- Submit button -->
+                <button
+                    class="fuse-mat-button-large w-full mt-6"
+                    mat-flat-button
+                    data-cy="signUpSubmit"
+                    [color]="'primary'"
+                    [disabled]="signUpForm.invalid || !isEmailAvailable"
+                    (click)="sendOTP()"
+                >
+                    <span *ngIf="!signUpForm.disabled">
+                        {{ 'CREATE_YOUR_FREE_ACCOUNT' | translate }}
+                    </span>
+                    <mat-progress-spinner
+                        *ngIf="signUpForm.disabled"
+                        [diameter]="24"
+                        [mode]="'indeterminate'"
+                    ></mat-progress-spinner>
+                </button>
+            </form>
+        </div>
+    </div>
+    <div
+        class="relative hidden md:flex flex-col flex-auto items-center justify-center w-1/2 h-full p-16 lg:px-28 overflow-hidden bg-primary-800 dark:border-l"
+    >
+        <div class="watermark absolute top-0 left-0">
+            <img
+                src="assets/images/watermark.svg"
+                class="waterMark1"
+                alt="Kamigo watermark"
+            />
+        </div>
+        <!--        Kamigo LOGO -->
+        <div class="logo d-flex item-center justify-center pb-8 z-10">
+            <img
+                src="assets/images/logo/logo-text-on-dark.svg"
+                alt="kamigo-white-logo"
+            />
+        </div>
+        <!-- Content -->
+        <div class="z-10 relative w-full max-w-2xl">
+            <div
+                class="mt-6 text-lg tracking-tight leading-6 text-gray-50"
+                [translate]="'KAMIGO_AIM'"
+                [translateParams]="{
+                    firm: userDetails?.firmName ? userDetails?.firmName : ''
+                }"
+            ></div>
+            <div class="mt-6 text-lg tracking-tight leading-6 text-gray-50">
+                {{ 'PRIVACY_AND_SECURITY' | translate }}
+            </div>
+            <div class="mt-6 text-lg tracking-tight leading-6 text-gray-50">
+                {{ 'ASSIST_YOU' | translate }}
+            </div>
+        </div>
+
+        <div
+            class="flex pt-8 text-3xl items-center justify-center z-10"
+            *ngIf="userDetails?.firmLogo"
+        >
+            <div>
+                <img class="firm-logo" alt="" [src]="userDetails?.firmLogo" />
+            </div>
+        </div>
+
+        <div class="watermark absolute bottom-0 right-0">
+            <img
+                src="assets/images/watermark.svg"
+                class="waterMark2"
+                alt="Kamigo watermark"
+            />
+        </div>
+    </div>
+</div>
+
+<div
+    class="w-screen h-screen fixed top-0 left-0 bg-white z-50"
+    *ngIf="openVerificationModal"
+>
+    <img
+        src="assets/images/logo/logo-text.svg"
+        alt=""
+        class="flex mx-auto p-6 w-44 items-center justify-center"
+    />
+    <div
+        class="flex max-w-md flex-col items-center mx-auto shadow-lg rounded-md p-6"
+    >
+        <div mat-dialog-content class="p-0">
+            <img src="assets/images/verify.svg" alt="" class="w-60 mx-auto" />
+            <p>{{ 'ENTER_VERIFICATION_CODE' | translate }}</p>
+            <small
+                >{{
+                    'VERIFICATION_CODE_SEND_TO_YOUR_EMAIL_ADDRESS' | translate
+                }}
+                <strong>{{ signUpForm.value.email }}</strong>
+            </small>
+            <mat-form-field appearance="fill" class="w-full">
+                <input
+                    maxlength="6"
+                    minlength="6"
+                    [(ngModel)]="sendVerification"
+                    matInput
+                    type="number"
+                    class="w-full"
+                />
+            </mat-form-field>
+        </div>
+        <div mat-dialog-actions>
+            <button
+                class="fuse-mat-button-large w-full"
+                mat-flat-button
+                [disabled]="!sendVerification"
+                [color]="'primary'"
+                (click)="signUp()"
+            >
+                <span> {{ 'VERIFY_YOUR_ACCOUNT' | translate }} </span>
+            </button>
+        </div>
+        <div class="my-4 border w-full"></div>
+        <div class="flex">
+            <p class="pr-2">{{ 'RESEND_OTP_IN' | translate }} :</p>
+            <countdown
+                #cd
+                (event)="checkCountdown($event)"
+                [config]="{ leftTime: 300, format: 'm:s' }"
+            ></countdown>
+        </div>
+        <div class="flex">
+            <p
+                (click)="openVerificationModal = false"
+                class="cursor-pointer text-sky-600"
+            >
+                {{ 'BACK_TO_SIGN_UP' | translate }}
+            </p>
+            <ng-container *ngIf="reSendOTP">
+                <p class="px-2">|</p>
+                <p
+                    (click)="sendOTP(); cd.restart()"
+                    class="cursor-pointer text-sky-600"
+                >
+                    {{ 'RESEND_OTP' | translate }}
+                </p>
+            </ng-container>
+        </div>
+    </div>
+</div>

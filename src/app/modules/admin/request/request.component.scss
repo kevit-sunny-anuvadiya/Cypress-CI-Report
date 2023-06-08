@@ -1,0 +1,75 @@
+.account-tab {
+    .SENT {
+        --fuse-bg-card-rgb: 255, 247, 235;
+        --fuse-border-rgb: 251, 181, 79;
+        border: 2px solid transparent;
+        &.active {
+            border-color: rgb(var(--fuse-border-rgb));
+        }
+        cursor: pointer;
+        * {
+            color: rgb(251, 181, 79);
+        }
+        .view-link {
+            padding: 2px 10px;
+            border: 1px solid rgb(var(--fuse-border-rgb));
+            border-radius: 15px;
+            background-color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+    }
+    .COMPLETED {
+        cursor: pointer;
+        --fuse-bg-card-rgb: 236, 255, 244;
+        --fuse-border-rgb: 89, 211, 142;
+        border: 2px solid transparent;
+        &.active {
+            border-color: rgb(var(--fuse-border-rgb));
+        }
+        * {
+            color: rgb(89, 211, 142);
+        }
+        .view-link {
+            padding: 2px 10px;
+            border: 1px solid rgb(var(--fuse-border-rgb));
+            border-radius: 15px;
+            background-color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+    }
+}
+.fill-questionnaire-button {
+    background-color: rgb(89, 211, 142);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 10px;
+    display: block;
+    width: fit-content;
+    border: 2px solid transparent;
+}
+.task-info {
+    height: calc(100vh - 465px) !important;
+    overflow-y: auto;
+    &.COMPLETED {
+        .fill-questionnaire-button {
+            background-color: transparent;
+            color: black;
+            border: 2px solid rgb(89, 211, 142);
+        }
+        .bg-card {
+            background-color: #f5f5f5 !important;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.tab-request{
+    background-color: #c7e4ef;
+    padding: 0px 10px;
+    border-radius: 10px;
+    display: block;
+    width: fit-content;
+    border: 2px solid transparent;
+}
